@@ -26,17 +26,18 @@ class DBHelper {
     //let xhr = new XMLHttpRequest();
 
     fetch(fetchURL, {
-        method: 'GET'
-      })
-      .then(response => {
-        response.json().then(restaurants => {
-          //console.log('restaurants JSON: ', restaurants);
-          callback(null, restaurants);
-        });
-      })
-      .catch(error => {
-        callback(`Unable to fulfill request. ${error}`, null);
-      });
+      method: 'GET'
+    })
+    .then(response => {
+      return response.json();
+    })
+    .then(restaurants => {
+      //console.log('restaurants JSON: ', restaurants);
+      callback(null, restaurants);
+    })
+    .catch(error => {
+      callback(`Unable to fulfill request. ${error}`, null);
+    });
     /*
         xhr.open('GET', DBHelper.DATABASE_URL);
         xhr.onload = () => {
