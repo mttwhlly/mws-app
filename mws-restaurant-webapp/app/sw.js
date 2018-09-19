@@ -2,12 +2,32 @@ importScripts('js/idb.js');
 
 var cacheID = 'restaurant-reviews-04';
 
-const dBPromise = idb.open('restaurantDB', 1, upgradeDB => {
-    switch(upgradeDB.oldVersion){
-        case 0:
-        upgradeDB.createObjectStore('restaurants', {keyPath: 'id'})
-    }
-});
+// const dBPromise = idb.open('restaurantDb', 1, upgradeDB => {
+//     switch(upgradeDB.oldVersion){
+//         case 0:
+//         var store = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'})
+//     }
+// });
+
+
+fetch('http://localhost:1337/restaurants')
+    .then(function(response){
+        console.log('hello')
+        return response.json()
+    })
+    .then(function(data) {
+        idb.open('restaurantDb', 1, upgradeDB => {
+            var store = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'})
+            console.log(data)
+        }).then(function(dB) {
+            //console.log(dB)
+            var tr = dB.transaction('restaurants', 'readwrite')
+            var restaurantStore = tr.objectStore('restaurants')
+            data.forEach(function(restaurant) {
+                restaurantStore.put(restaurant)
+            })
+        })
+    });
 
 self.addEventListener('install', event => {
     event.waitUntil(
