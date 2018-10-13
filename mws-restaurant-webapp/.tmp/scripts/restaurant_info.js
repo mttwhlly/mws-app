@@ -53,7 +53,7 @@ initMap = () => {
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
     }
   });
-};
+};*/
 
 /**
  * Get current restaurant from page URL.
@@ -155,11 +155,11 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 createReviewHTML = review => {
   const li = document.createElement('li');
   const name = document.createElement('p');
-  name.innerHTML = review.name;
+  name.innerHTML = `Name: ${review.name}`;
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = `Date: ${review.date}.toLocaleString()}`;
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -169,7 +169,6 @@ createReviewHTML = review => {
   const comments = document.createElement('p');
   comments.innerHTML = review.comments;
   li.appendChild(comments);
-
   return li;
 };
 
@@ -179,6 +178,7 @@ createReviewHTML = review => {
 fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
+  li.className = 'restaurantCrumb';
   li.innerHTML = restaurant.name;
   breadcrumb.appendChild(li);
 };

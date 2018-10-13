@@ -6,7 +6,7 @@ var markers = [];
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', event => {
-  initMap(); // added 
+  initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -162,6 +162,33 @@ createRestaurantHTML = restaurant => {
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   image.setAttribute('alt', image.src);
   li.append(image);
+
+  const changeHeart = (el, hrt) => {
+    if (!hrt) {
+      console.log('not a fave');
+      el.classList.remove('yes');
+      el.classList.add('no');
+      el.setAttribute('aria-label', 'select as a favorite');
+    } else {
+      console.log('a fave');
+      el.classList.remove('no');
+      el.classList.add('yes');
+      el.setAttribute('aria-label', 'deselect as a favorite');
+    }
+  };
+
+  const heart = document.createElement('button');
+  heart.innerHTML = '&hearts;';
+  heart.classList.add('heart');
+  heart.onclick = function () {
+    console.log('im working');
+    const isHeart = !restaurant.is_favorite;
+    DBHelper.updateFave(restaurant.id, isHeart);
+    restaurant.is_favorite = !restaurant.is_favorite;
+    changeHeart(heart, restaurant.is_favorite);
+  };
+  changeHeart(heart, restaurant.is_favorite);
+  li.append(heart);
 
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
