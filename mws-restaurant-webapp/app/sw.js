@@ -25,6 +25,29 @@ fetch('http://localhost:1337/restaurants', {
         });
     });
 
+fetch('http://localhost:1337/reviews', {
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    },
+})
+    .then(function(response){
+        //console.log('hello');
+        return response.json();
+    })
+    .then(function(data) {
+        idb.open('reviewDb', 1, upgradeDB => {
+            var store = upgradeDB.createObjectStore('reviews', {keyPath: 'id'});
+            //console.log(data);
+        }).then(function(dB) {
+            //console.log(dB)
+            var tr = dB.transaction('reviews', 'readwrite');
+            var reviewStore = tr.objectStore('reviews');
+            data.forEach(function(review) {
+                reviewStore.put(review);
+            });
+        });
+    });
+
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(cacheID).then(cache => {
@@ -35,6 +58,7 @@ self.addEventListener('install', event => {
                     '/index.html',
                     '/restaurant.html',
                     '/css/styles.css',
+                    '/css/leaflet.css',
                     '/js/dbhelper.js',
                     '/js/restaurant_info.js',
                     '/js/main.js',
@@ -70,23 +94,22 @@ self.addEventListener('fetch', event => {
         event.request.mode = 'no-cors';
         //console.log('fetch running with no-cors')
     }
+
     event.respondWith(caches.match(cacheRequest).then(response => {
         return (
-                response ||
-                fetch(event.request).then(() => {let fetchResponse = response.clone(); return fetchResponse;})
+            response ||
+                fetch(event.request)
                 .then(fetchResponse => {
-                    return caches.open(cacheID).then(cache => {
-                        console.log('event.request = ' + event.request)
-                        console.log('fetchResponse = ' + fetchResponse)
-                        cache.put(event.request, fetchResponse).then(() => {console.log('request/response pair added to cache')})
-                        //console.log(fetchResponse);
-                        return fetchResponse.clone();
+                    caches.open(cacheID).then(cache => {
+                        cache.put(event.request, fetchResponse.clone())
+                        return fetchResponse;
                     }).catch(function() {
                         console.log('something wrong with running fetch response function')
                         // Do nothing.
                       });
                 })
                 .catch(error => {
+                    console.log(error);
                     return new Response('Oops, it looks like you are not connected to the internet', {
                         status: 404,
                         statusText: 'Not connected to the internet'

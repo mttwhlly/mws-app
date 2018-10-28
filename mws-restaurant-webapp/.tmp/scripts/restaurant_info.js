@@ -5,8 +5,8 @@ var newMap;
  * Initialize map as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', event => {
-  fetchNeighborhoods();
-  fetchCuisines();
+  //fetchNeighborhoods();
+  //fetchCuisines();
   initMap();
 });
 
@@ -133,6 +133,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  * Create all reviews HTML and add them to the webpage.
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+  //console.log('fill reviews running')
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';

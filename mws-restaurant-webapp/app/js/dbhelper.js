@@ -188,8 +188,8 @@ class DBHelper {
             keyPath: 'id'
           })
         case 1:
-        upgradeDB.createObjectStore('reviews', {
-          keyPath: 'id'
+          upgradeDB.createObjectStore('reviews', {
+            keyPath: 'id'
         }).createIndex('restaurant_id', 'restaurant_id');
           // TODO: add case 2 that deals with reviews
       }
