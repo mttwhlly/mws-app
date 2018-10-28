@@ -181,13 +181,16 @@ class DBHelper {
    */
 
   static dBPromise() {
-    return idb.open('restaurantDb', 2, upgradeDB => {
+    return idb.open('restaurantDb', 1, (upgradeDB) => {
       switch (upgradeDB.oldVersion) {
         case 0:
-        case 1:
           upgradeDB.createObjectStore('restaurants', {
             keyPath: 'id'
-          });
+          })
+        case 1:
+        upgradeDB.createObjectStore('reviews', {
+          keyPath: 'id'
+        }).createIndex('restaurant_id', 'restaurant_id');
           // TODO: add case 2 that deals with reviews
       }
     });
@@ -200,16 +203,18 @@ class DBHelper {
   static updateFave(restaurantID, isFavorite) {
     console.log('updated status: ' + isFavorite)
 
+    console.log(`${this.DATABASE_URL}${restaurantID}/?is_favorite=${isFavorite}`)
+
     fetch(`${this.DATABASE_URL}${restaurantID}/?is_favorite=${isFavorite}`, {
         method: 'PUT'
       })
       .then(() => {
         this.dBPromise().then(db => {
-          if (!db.ok) {
+          /*if (!db.ok) {
             throw new TypeError('Bad response status');
           } else {
             console.log(db)
-          }
+          }*/
           const tr = db.transaction('restaurants', 'readwrite');
           const store = tr.objectStore('restaurants');
           store.get(restaurantID)
@@ -218,8 +223,8 @@ class DBHelper {
               restaurant.is_favorite = isFavorite;
               store.put(restaurant);
             });
-        });
       });
+    });
   }
 
   /**
@@ -232,8 +237,7 @@ class DBHelper {
       .then(reviews => {
           this.dBPromise()
             .then(db => {
-              if (!db) return;
-
+              //if (!db) return;
               const tr = db.transaction('reviews', 'readwrite');
               const store = tr.objectStore('reviews');
               if (Array.isArray(reviews)) {

@@ -2,7 +2,11 @@ importScripts('js/idb.js');
 
 var cacheID = 'restaurant-reviews-04';
 
-fetch('http://localhost:1337/restaurants')
+fetch('http://localhost:1337/restaurants', {
+    headers: {
+        "Content-Type": "application/json; charset=utf-8"
+    },
+})
     .then(function(response){
         //console.log('hello');
         return response.json();
@@ -10,7 +14,7 @@ fetch('http://localhost:1337/restaurants')
     .then(function(data) {
         idb.open('restaurantDb', 1, upgradeDB => {
             var store = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
-            console.log(data);
+            //console.log(data);
         }).then(function(dB) {
             //console.log(dB)
             var tr = dB.transaction('restaurants', 'readwrite');
@@ -34,8 +38,7 @@ self.addEventListener('install', event => {
                     '/js/dbhelper.js',
                     '/js/restaurant_info.js',
                     '/js/main.js',
-                    '/js/register.js',
-                    //'/js/idb.js',
+                    '/js/idb.js',
                     '/img/1.jpg',
                     '/img/2.jpg',
                     '/img/3.jpg',
@@ -65,18 +68,21 @@ self.addEventListener('fetch', event => {
     }
     if (cacheUrlObj.hostname !== 'localhost') {
         event.request.mode = 'no-cors';
+        //console.log('fetch running with no-cors')
     }
-    event.respondWith(
-        caches.match(cacheRequest).then(response => {
-            return (
+    event.respondWith(caches.match(cacheRequest).then(response => {
+        return (
                 response ||
-                fetch(event.request)
+                fetch(event.request).then(() => {let fetchResponse = response.clone(); return fetchResponse;})
                 .then(fetchResponse => {
                     return caches.open(cacheID).then(cache => {
-                        cache.put(event.request, fetchResponse);
-                        console.log(fetchResponse);
+                        console.log('event.request = ' + event.request)
+                        console.log('fetchResponse = ' + fetchResponse)
+                        cache.put(event.request, fetchResponse).then(() => {console.log('request/response pair added to cache')})
+                        //console.log(fetchResponse);
                         return fetchResponse.clone();
                     }).catch(function() {
+                        console.log('something wrong with running fetch response function')
                         // Do nothing.
                       });
                 })
