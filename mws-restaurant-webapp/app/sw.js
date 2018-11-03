@@ -2,51 +2,51 @@ importScripts('js/idb.js');
 
 var cacheID = 'restaurant-reviews-04';
 
-fetch('http://localhost:1337/restaurants', {
-    headers: {
-        "Content-Type": "application/json; charset=utf-8"
-    },
-})
-    .then(function(response){
-        //console.log('hello');
-        return response.json();
-    })
-    .then(function(data) {
-        idb.open('restaurantDb', 1, upgradeDB => {
-            var store = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
-            //console.log(data);
-        }).then(function(dB) {
-            //console.log(dB)
-            var tr = dB.transaction('restaurants', 'readwrite');
-            var restaurantStore = tr.objectStore('restaurants');
-            data.forEach(function(restaurant) {
-                restaurantStore.put(restaurant);
-            });
-        });
-    });
+// fetch('http://localhost:1337/restaurants', {
+//     headers: {
+//         "Content-Type": "application/json; charset=utf-8"
+//     },
+// })
+//     .then(function(response){
+//         //console.log('hello');
+//         return response.json();
+//     })
+//     .then(function(data) {
+//         idb.open('restaurantDb', 1, upgradeDB => {
+//             var store = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
+//             //console.log(data);
+//         }).then(function(dB) {
+//             //console.log(dB)
+//             var tr = dB.transaction('restaurants', 'readwrite');
+//             var restaurantStore = tr.objectStore('restaurants');
+//             data.forEach(function(restaurant) {
+//                 restaurantStore.put(restaurant);
+//             });
+//         });
+//     });
 
-fetch('http://localhost:1337/reviews', {
-    headers: {
-        "Content-Type": "application/json; charset=utf-8"
-    },
-})
-    .then(function(response){
-        //console.log('hello');
-        return response.json();
-    })
-    .then(function(data) {
-        idb.open('reviewDb', 1, upgradeDB => {
-            var store = upgradeDB.createObjectStore('reviews', {keyPath: 'id'});
-            //console.log(data);
-        }).then(function(dB) {
-            //console.log(dB)
-            var tr = dB.transaction('reviews', 'readwrite');
-            var reviewStore = tr.objectStore('reviews');
-            data.forEach(function(review) {
-                reviewStore.put(review);
-            });
-        });
-    });
+// fetch('http://localhost:1337/reviews', {
+//     headers: {
+//         "Content-Type": "application/json; charset=utf-8"
+//     },
+// })
+//     .then(function(response){
+//         //console.log('hello');
+//         return response.json();
+//     })
+//     .then(function(data) {
+//         idb.open('reviewDb', 1, upgradeDB => {
+//             var store = upgradeDB.createObjectStore('reviews', {keyPath: 'id'});
+//             //console.log(data);
+//         }).then(function(dB) {
+//             //console.log(dB)
+//             var tr = dB.transaction('reviews', 'readwrite');
+//             var reviewStore = tr.objectStore('reviews');
+//             data.forEach(function(review) {
+//                 reviewStore.put(review);
+//             });
+//         });
+//     });
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -106,7 +106,7 @@ self.addEventListener('fetch', event => {
                     }).catch(function() {
                         console.log('something wrong with running fetch response function')
                         // Do nothing.
-                      });
+                    });
                 })
                 .catch(error => {
                     console.log(error);

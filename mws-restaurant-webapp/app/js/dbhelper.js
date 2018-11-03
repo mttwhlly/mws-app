@@ -9,7 +9,7 @@ class DBHelper {
    */
   static get DATABASE_URL() {
     const port = 1337; // Change this to your server port
-    return `http://localhost:${port}/restaurants/`;
+    return `http://localhost:${port}`;
   }
 
   /**
@@ -18,9 +18,9 @@ class DBHelper {
   static fetchRestaurants(callback, id) {
     let fetchURL;
     if (!id) {
-      fetchURL = DBHelper.DATABASE_URL;
+      fetchURL = DBHelper.DATABASE_URL + '/restaurants';
     } else {
-      fetchURL = DBHelper.DATABASE_URL + '/' + id;
+      fetchURL = DBHelper.DATABASE_URL + '/restaurants/' + id;
     }
 
     //let xhr = new XMLHttpRequest();
@@ -190,12 +190,84 @@ class DBHelper {
         case 1:
           upgradeDB.createObjectStore('reviews', {
             keyPath: 'id'
-        }).createIndex('restaurant_id', 'restaurant_id');
+        })//.createIndex('restaurant_id', 'restaurant_id');
           // TODO: add case 2 that deals with reviews
       }
     });
   }
+/*
+  static fetchRestaurants() {
+    return this.dBPromise()
+      .then(db => {
+        const tr = db.transaction('restaurants');
+        const restaurantStore = tr.objectStore('restaurants');
+        return restaurantStore.getAll();
+      })
+      .then(restaurants => {
+        if (restaurants.length !== 0) {
+          return Promise.resolve(restaurants);
+        }
+        return this.cacheRestaurants();
+      })
+  }
 
+  static cacheRestaurants() {
+    return fetch(DBHelper.DATABASE_URL + '/restaurants')
+      .then(response => response.json())
+      .then(restaurants => {
+        return this.dBPromise()
+          .then(db => {
+            const tr = db.transaction('restaurants', 'readwrite');
+            const restaurantStore = tr.objectStore('restaurants');
+            restaurants.forEach(restaurant => restaurantStore.put(restaurant));
+
+            return tr.complete.then(() => Promise.resolve(restaurants));
+          });
+      });
+  }
+*/
+
+static getStoredObjectById(table, idx, id) {
+  return this.dBPromise()
+    .then(function(db) {
+      if (!db) return;
+
+      const store = db.transaction(table).objectStore(table);
+      const indexId = store.index(idx);
+      return indexId.getAll(id);
+    });
+}
+
+// fetch reviews
+static fetchReviews(id) {
+  return fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${id}`)
+    .then(response => response.json())
+    .then(reviews => {
+      this.dBPromise()
+        .then(db => {
+          if (!db) return;
+
+          let tx = db.transaction('reviews', 'readwrite');
+          const store = tx.objectStore('reviews');
+          if (Array.isArray(reviews)) {
+            reviews.forEach(function(review) {
+              store.put(review);
+            });
+          } else {
+            store.put(reviews);
+          }
+        });
+      console.log('revs are: ', reviews);
+      return Promise.resolve(reviews);
+    })
+    .catch(error => {
+      return DBHelper.getStoredObjectById('reviews', 'restaurant', id)
+        .then((storedReviews) => {
+          console.log('looking for offline stored reviews');
+          return Promise.resolve(storedReviews);
+        })
+    });
+}
   /**
    * Update `is_favorite` in DB -- referenced: MWS Webinar Stage 3 Project Walk-Through Webinar by Elisa Romondia and Lorenzo Zaccagnini
    */
@@ -203,9 +275,9 @@ class DBHelper {
   static updateFave(restaurantID, isFavorite) {
     console.log('updated status: ' + isFavorite)
 
-    console.log(`${this.DATABASE_URL}${restaurantID}/?is_favorite=${isFavorite}`)
+    console.log(`${this.DATABASE_URL}/restaurants/${restaurantID}/?is_favorite=${isFavorite}`)
 
-    fetch(`${this.DATABASE_URL}${restaurantID}/?is_favorite=${isFavorite}`, {
+    fetch(`${this.DATABASE_URL}/restaurants/${restaurantID}/?is_favorite=${isFavorite}`, {
         method: 'PUT'
       })
       .then(() => {
