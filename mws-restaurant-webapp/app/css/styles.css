@@ -390,7 +390,7 @@ input, textarea {
   color: #333;
   line-height: 1.5;
 }
-form .button button {
+form .submit-button button {
   background-color: #006fb9;
   color: #fff;
   font-size: 1em;

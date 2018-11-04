@@ -195,10 +195,10 @@ addReview = () => {
 
   // Add data to DOM
   const formReview = {
-      restaurant_id: parseInt(review[3]),
-      rating: parseInt(review[1]),
-      name: review[0],
-      comments: review[2].substring(0, 300),
+      restaurant_id: parseInt(review[0]),
+      name: review[1],
+      rating: parseInt(review[2]),
+      comments: review[3].substring(0, 300),
       createdAt: new Date()
   };
   // Send review to backend

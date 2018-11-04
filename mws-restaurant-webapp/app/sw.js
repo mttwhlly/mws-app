@@ -55,6 +55,7 @@ self.addEventListener('install', event => {
                 .addAll([
                     '/manifest.json',
                     '/',
+                    '/sw.js',
                     '/index.html',
                     '/restaurant.html',
                     '/css/styles.css',
