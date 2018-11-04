@@ -13,7 +13,7 @@ class DBHelper {
   }
 
   /**
-   * Fetch all restaurants.
+   * Fetch restaurants.
    */
   static fetchRestaurants(callback, id) {
     let fetchURL;
@@ -191,8 +191,7 @@ class DBHelper {
         case 1:
           upgradeDB.createObjectStore('reviews', {
             keyPath: 'id'
-          }); //.createIndex('restaurant_id', 'restaurant_id');
-        // TODO: add case 2 that deals with reviews
+          });
       }
     });
   }
@@ -211,8 +210,7 @@ class DBHelper {
           return this.cacheRestaurants();
         })
     }
-  
-    static cacheRestaurants() {
+      static cacheRestaurants() {
       return fetch(DBHelper.DATABASE_URL + '/restaurants')
         .then(response => response.json())
         .then(restaurants => {
@@ -221,12 +219,10 @@ class DBHelper {
               const tr = db.transaction('restaurants', 'readwrite');
               const restaurantStore = tr.objectStore('restaurants');
               restaurants.forEach(restaurant => restaurantStore.put(restaurant));
-  
-              return tr.complete.then(() => Promise.resolve(restaurants));
+                return tr.complete.then(() => Promise.resolve(restaurants));
             });
         });
-    }
-  */
+    }*/
 
   static getStoredObjectById(table, idx, id) {
     return this.dBPromise().then(function (db) {
@@ -319,14 +315,14 @@ class DBHelper {
   }
 
   static addReview(review) {
-    let offlineObj = {
+    let offlineReview = {
       name: 'addReview',
       data: review,
       objectType: 'review'
     };
-    // find out if offline
-    if (!navigator.onLine && offlineObj.name === 'addReview') {
-      DBHelper.storeAndSendReviews(offlineObj);
+    // check if offline
+    if (!navigator.onLine && offlineReview.name === 'addReview') {
+      DBHelper.storeAndSendReviews(offlineReview);
       return;
     }
     let reviewSend = {
@@ -335,7 +331,7 @@ class DBHelper {
       'comments': review.comments,
       'restaurant_id': parseInt(review.restaurant_id)
     };
-    var fetchOptions = {
+    let fetchOptions = {
       method: 'POST',
       body: JSON.stringify(reviewSend),
       headers: new Headers({
@@ -352,8 +348,8 @@ class DBHelper {
     }).then(data => console.log('fetch worked bruh')).catch(error);
   }
 
-  static storeAndSendReviews(offlineObj) {
-    localStorage.setItem('data', JSON.stringify(offlineObj.data));
+  static storeAndSendReviews(offlineReview) {
+    localStorage.setItem('data', JSON.stringify(offlineReview.data));
     window.addEventListener('online', event => {
       let data = JSON.parse(localStorage.getItem('data'));
       [...document.querySelectorAll('.reviewsOffline')].forEach(el => {
@@ -361,8 +357,8 @@ class DBHelper {
         el.querySelector('.offlineLabel').remove();
       });
       if (data !== null) {
-        if (offlineObj.name === 'addReview') {
-          DBHelper.addReview(offlineObj.data);
+        if (offlineReview.name === 'addReview') {
+          DBHelper.addReview(offlineReview.data);
         }
         localStorage.removeItem('data');
       }

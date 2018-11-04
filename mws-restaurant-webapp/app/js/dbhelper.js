@@ -13,7 +13,7 @@ class DBHelper {
   }
 
   /**
-   * Fetch all restaurants.
+   * Fetch restaurants.
    */
   static fetchRestaurants(callback, id) {
     let fetchURL;
@@ -190,84 +190,83 @@ class DBHelper {
         case 1:
           upgradeDB.createObjectStore('reviews', {
             keyPath: 'id'
-        })//.createIndex('restaurant_id', 'restaurant_id');
-          // TODO: add case 2 that deals with reviews
+          })
       }
     });
   }
-/*
-  static fetchRestaurants() {
+  /*
+    static fetchRestaurants() {
+      return this.dBPromise()
+        .then(db => {
+          const tr = db.transaction('restaurants');
+          const restaurantStore = tr.objectStore('restaurants');
+          return restaurantStore.getAll();
+        })
+        .then(restaurants => {
+          if (restaurants.length !== 0) {
+            return Promise.resolve(restaurants);
+          }
+          return this.cacheRestaurants();
+        })
+    }
+
+    static cacheRestaurants() {
+      return fetch(DBHelper.DATABASE_URL + '/restaurants')
+        .then(response => response.json())
+        .then(restaurants => {
+          return this.dBPromise()
+            .then(db => {
+              const tr = db.transaction('restaurants', 'readwrite');
+              const restaurantStore = tr.objectStore('restaurants');
+              restaurants.forEach(restaurant => restaurantStore.put(restaurant));
+
+              return tr.complete.then(() => Promise.resolve(restaurants));
+            });
+        });
+    }*/
+
+
+  static getStoredObjectById(table, idx, id) {
     return this.dBPromise()
-      .then(db => {
-        const tr = db.transaction('restaurants');
-        const restaurantStore = tr.objectStore('restaurants');
-        return restaurantStore.getAll();
-      })
-      .then(restaurants => {
-        if (restaurants.length !== 0) {
-          return Promise.resolve(restaurants);
-        }
-        return this.cacheRestaurants();
-      })
-  }
+      .then(function (db) {
+        if (!db) return;
 
-  static cacheRestaurants() {
-    return fetch(DBHelper.DATABASE_URL + '/restaurants')
-      .then(response => response.json())
-      .then(restaurants => {
-        return this.dBPromise()
-          .then(db => {
-            const tr = db.transaction('restaurants', 'readwrite');
-            const restaurantStore = tr.objectStore('restaurants');
-            restaurants.forEach(restaurant => restaurantStore.put(restaurant));
-
-            return tr.complete.then(() => Promise.resolve(restaurants));
-          });
+        const store = db.transaction(table).objectStore(table);
+        const indexId = store.index(idx);
+        return indexId.getAll(id);
       });
   }
-*/
 
-static getStoredObjectById(table, idx, id) {
-  return this.dBPromise()
-    .then(function(db) {
-      if (!db) return;
+  // fetch reviews
+  static fetchReviews(id) {
+    return fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${id}`)
+      .then(response => response.json())
+      .then(reviews => {
+        this.dBPromise()
+          .then(db => {
+            if (!db) return;
 
-      const store = db.transaction(table).objectStore(table);
-      const indexId = store.index(idx);
-      return indexId.getAll(id);
-    });
-}
-
-// fetch reviews
-static fetchReviews(id) {
-  return fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${id}`)
-    .then(response => response.json())
-    .then(reviews => {
-      this.dBPromise()
-        .then(db => {
-          if (!db) return;
-
-          let tr = db.transaction('reviews', 'readwrite');
-          const store = tr.objectStore('reviews');
-          if (Array.isArray(reviews)) {
-            reviews.forEach(function(review) {
-              store.put(review);
-            });
-          } else {
-            store.put(reviews);
-          }
-        });
-      console.log('reviews are fetched: ', reviews);
-      return Promise.resolve(reviews);
-    })
-    .catch(error => {
-      return DBHelper.getStoredObjectById('reviews', 'restaurant', id)
-        .then((storedReviews) => {
-          console.log('looking for offline stored reviews');
-          return Promise.resolve(storedReviews);
-        })
-    });
-}
+            let tr = db.transaction('reviews', 'readwrite');
+            const store = tr.objectStore('reviews');
+            if (Array.isArray(reviews)) {
+              reviews.forEach(function (review) {
+                store.put(review);
+              });
+            } else {
+              store.put(reviews);
+            }
+          });
+        console.log('reviews are fetched: ', reviews);
+        return Promise.resolve(reviews);
+      })
+      .catch(error => {
+        return DBHelper.getStoredObjectById('reviews', 'restaurant', id)
+          .then((storedReviews) => {
+            console.log('looking for offline stored reviews');
+            return Promise.resolve(storedReviews);
+          })
+      });
+  }
   /**
    * Update `is_favorite` in DB -- referenced: MWS Webinar Stage 3 Project Walk-Through Webinar by Elisa Romondia and Lorenzo Zaccagnini
    */
@@ -295,8 +294,8 @@ static fetchReviews(id) {
               restaurant.is_favorite = isFavorite;
               store.put(restaurant);
             });
+        });
       });
-    });
   }
 
   /**
@@ -307,102 +306,105 @@ static fetchReviews(id) {
     return fetch(`${DBHelper.DATABASE_URL}reviews/?restaurantid?=${id}`)
       .then(response => response.json())
       .then(reviews => {
-          this.dBPromise()
-            .then(db => {
-              //if (!db) return;
-              const tr = db.transaction('reviews', 'readwrite');
-              const store = tr.objectStore('reviews');
-              if (Array.isArray(reviews)) {
-                reviews.forEach(function(review){
-                    store.put(review);
-                  });
-              } else {
-                store.put(reviews);
-              }
-            });
-            return Promise.resolve(reviews);
-        })
-        .catch(error => {
-          return DBHelper.getDbReviews('reviews', 'restaurant', id)
-            .then((dBReviews) => {
-              return Promise.resolve(dBReviews);
-            })
-        })
-    }
+        this.dBPromise()
+          .then(db => {
+            //if (!db) return;
+            const tr = db.transaction('reviews', 'readwrite');
+            const store = tr.objectStore('reviews');
+            if (Array.isArray(reviews)) {
+              reviews.forEach(function (review) {
+                store.put(review);
+              });
+            } else {
+              store.put(reviews);
+            }
+          });
+        return Promise.resolve(reviews);
+      })
+      .catch(error => {
+        return DBHelper.getDbReviews('reviews', 'restaurant', id)
+          .then((dBReviews) => {
+            return Promise.resolve(dBReviews);
+          })
+      })
+  }
 
-    static addReview(review) {
-      let offlineObj = {
-        name: 'addReview',
-        data: review,
-        objectType: 'review'
-      };
-      // find out if offline
-      if (!navigator.onLine && (offlineObj.name === 'addReview')) {
-        DBHelper.storeAndSendReviews(offlineObj);
-        return;
-      }
-      let reviewSend = {
-        'name': review.name,
-        'rating': parseInt(review.rating),
-        'comments': review.comments,
-        'restaurant_id': parseInt(review.restaurant_id)
-      };
-      var fetchOptions = {
-        method: 'POST',
-        body: JSON.stringify(reviewSend),
-        headers: new Headers({
-          'Content-Type': 'application/json; charset=utf-8'
-        })
-      };
-      fetch(`http://localhost:1337/reviews`, fetchOptions).then((response) => {
+  static addReview(review) {
+    let offlineReview = {
+      name: 'addReview',
+      data: review,
+      objectType: 'review'
+    };
+    // check if offline
+    if (!navigator.onLine && (offlineReview.name === 'addReview')) {
+      DBHelper.storeAndSendReviews(offlineReview);
+      return;
+    }
+    let reviewSend = {
+      'name': review.name,
+      'rating': parseInt(review.rating),
+      'comments': review.comments,
+      'restaurant_id': parseInt(review.restaurant_id)
+    };
+    let fetchOptions = {
+      method: 'POST',
+      body: JSON.stringify(reviewSend),
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8'
+      })
+    };
+    fetch(`http://localhost:1337/reviews`, fetchOptions).then((response) => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.indexOf('application/json') !== -1) {
           return response.json();
-        } else { return 'API called'}})
-        .then((data) => console.log('fetch worked bruh'))
-        .catch(error)
-    }
-
-    static storeAndSendReviews(offlineObj) {
-      localStorage.setItem('data', JSON.stringify(offlineObj.data));
-      window.addEventListener('online', (event) => {
-        let data = JSON.parse(localStorage.getItem('data'));
-        [...document.querySelectorAll('.reviewsOffline')]
-        .forEach(el => {
-          el.classList.remove('reviewsOffline')
-          el.querySelector('.offlineLabel').remove();
-        });
-        if (data !== null) {
-          if (offlineObj.name === 'addReview') {
-            DBHelper.addReview(offlineObj.data);
-          }
-          localStorage.removeItem('data');
+        } else {
+          return 'API called'
         }
-      });
-    }
+      })
+      .then((data) => console.log('fetch worked bruh'))
+      .catch(error)
+  }
 
-/**
- * Map marker for a restaurant.
- */
-static mapMarkerForRestaurant(restaurant, map) {
-  // https://leafletjs.com/reference-1.3.0.html#marker
-  const marker = new L.marker([restaurant.latlng.lat, restaurant.latlng.lng], {
-    title: restaurant.name,
-    alt: restaurant.name,
-    url: DBHelper.urlForRestaurant(restaurant)
-  });
-  marker.addTo(newMap);
-  return marker;
-}
-/* static mapMarkerForRestaurant(restaurant, map) {
-  const marker = new google.maps.Marker({
-    position: restaurant.latlng,
-    title: restaurant.name,
-    url: DBHelper.urlForRestaurant(restaurant),
-    map: map,
-    animation: google.maps.Animation.DROP}
-  );
-  return marker;
-} */
+  static storeAndSendReviews(offlineReview) {
+    localStorage.setItem('data', JSON.stringify(offlineReview.data));
+    window.addEventListener('online', (event) => {
+      let data = JSON.parse(localStorage.getItem('data'));
+      [...document.querySelectorAll('.reviewsOffline')]
+      .forEach(el => {
+        el.classList.remove('reviewsOffline')
+        el.querySelector('.offlineLabel').remove();
+      });
+      if (data !== null) {
+        if (offlineReview.name === 'addReview') {
+          DBHelper.addReview(offlineReview.data);
+        }
+        localStorage.removeItem('data');
+      }
+    });
+  }
+
+  /**
+   * Map marker for a restaurant.
+   */
+  static mapMarkerForRestaurant(restaurant, map) {
+    // https://leafletjs.com/reference-1.3.0.html#marker
+    const marker = new L.marker([restaurant.latlng.lat, restaurant.latlng.lng], {
+      title: restaurant.name,
+      alt: restaurant.name,
+      url: DBHelper.urlForRestaurant(restaurant)
+    });
+    marker.addTo(newMap);
+    return marker;
+  }
+  /* static mapMarkerForRestaurant(restaurant, map) {
+    const marker = new google.maps.Marker({
+      position: restaurant.latlng,
+      title: restaurant.name,
+      url: DBHelper.urlForRestaurant(restaurant),
+      map: map,
+      animation: google.maps.Animation.DROP}
+    );
+    return marker;
+  } */
 
 }
