@@ -95,28 +95,41 @@ self.addEventListener('fetch', event => {
         event.request.mode = 'no-cors';
         //console.log('fetch running with no-cors')
     }
-
-    event.respondWith(caches.match(cacheRequest).then(response => {
-        return (
-            response ||
-                fetch(event.request)
-                .then(fetchResponse => {
-                    caches.open(cacheID).then(cache => {
-                        cache.put(event.request, fetchResponse.clone())
-                        return fetchResponse;
-                    }).catch(function() {
-                        console.log('something wrong with running fetch response function')
-                        // Do nothing.
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                    return new Response('Oops, it looks like you are not connected to the internet', {
-                        status: 404,
-                        statusText: 'Not connected to the internet'
-                    });
-                })
-            );
-        })
-    );
+    event.respondWith(caches.match(event.request).then(function (response) {
+        return response || fetch(event.request);
+    }));
 });
+
+// self.addEventListener('activate', event => {
+//     event.waitUntil(caches.keys().then(function (cacheNames) {
+//         return Promise.all(cacheNames.filter(function (cacheName) {
+//         return cacheName.startsWith('restaurant-') && !allCaches.includes(cacheName);
+//         }).map(function (cacheName) {
+//         return caches['delete'](cacheName);
+//         }));
+//     }));
+// });
+
+// event.respondWith(caches.match(cacheRequest).then(response => {
+//     return (
+//         response ||
+//             fetch(event.request)
+//             .then(fetchResponse => {
+//                 caches.open(cacheID).then(cache => {
+//                     cache.put(event.request, fetchResponse.clone())
+//                     return fetchResponse;
+//                 }).catch(function() {
+//                     console.log('something wrong with running fetch response function')
+//                     // Do nothing.
+//                 });
+//             })
+//             .catch(error => {
+//                 console.log(error);
+//                 return new Response('Oops, it looks like you are not connected to the internet', {
+//                     status: 404,
+//                     statusText: 'Not connected to the internet'
+//                 });
+//             })
+//         );
+//     })
+//);

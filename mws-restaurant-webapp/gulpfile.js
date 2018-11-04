@@ -7,11 +7,17 @@ const browserSync = require('browser-sync').create();
 const del = require('del');
 const wiredep = require('wiredep').stream;
 const runSequence = require('run-sequence');
-
+const inlinesource = require('gulp-inline-source');
 const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
 
 let dev = true;
+
+gulp.task('inline', function() {
+  return gulp.src('app/html-src/*.html')
+  .pipe(inlinesource())
+  .pipe(gulp.dest('app/'));
+ });
 
 gulp.task('css', () => {
   return gulp.src('app/css/*.css')

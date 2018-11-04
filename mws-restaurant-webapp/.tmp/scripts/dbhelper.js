@@ -15,6 +15,7 @@ class DBHelper {
   /**
    * Fetch restaurants.
    */
+
   static fetchRestaurants(callback, id) {
     let fetchURL;
     if (!id) {
@@ -33,9 +34,21 @@ class DBHelper {
     }).then(restaurants => {
       //console.log('restaurants JSON: ', restaurants);
       callback(null, restaurants);
+
+      return this.dBPromise();
+    }).then(db => {
+      const tr = db.transaction('restaurants');
+      const restaurantStore = tr.objectStore('restaurants');
+      return restaurantStore.getAll();
+    }).then(restaurants => {
+      if (restaurants.length !== 0) {
+        return Promise.resolve(restaurants);
+      }
+      return this.cacheRestaurants();
     }).catch(error => {
       callback(`Unable to fulfill request. ${error}`, null);
     });
+
     /*
         xhr.open('GET', DBHelper.DATABASE_URL);
         xhr.onload = () => {
@@ -49,7 +62,7 @@ class DBHelper {
           }
         };
         xhr.send();
-        */
+    */
   }
 
   /**
@@ -182,7 +195,7 @@ class DBHelper {
    */
 
   static dBPromise() {
-    return idb.open('restaurantDb', 1, upgradeDB => {
+    return idb.open('restaurantDb', 2, upgradeDB => {
       switch (upgradeDB.oldVersion) {
         case 0:
           upgradeDB.createObjectStore('restaurants', {
@@ -195,34 +208,33 @@ class DBHelper {
       }
     });
   }
-  /*
-    static fetchRestaurants() {
+
+  /*static fetchRestaurants() {
       return this.dBPromise()
-        .then(db => {
-          const tr = db.transaction('restaurants');
-          const restaurantStore = tr.objectStore('restaurants');
-          return restaurantStore.getAll();
-        })
-        .then(restaurants => {
-          if (restaurants.length !== 0) {
-            return Promise.resolve(restaurants);
-          }
-          return this.cacheRestaurants();
-        })
-    }
-      static cacheRestaurants() {
-      return fetch(DBHelper.DATABASE_URL + '/restaurants')
-        .then(response => response.json())
-        .then(restaurants => {
-          return this.dBPromise()
-            .then(db => {
-              const tr = db.transaction('restaurants', 'readwrite');
-              const restaurantStore = tr.objectStore('restaurants');
-              restaurants.forEach(restaurant => restaurantStore.put(restaurant));
-                return tr.complete.then(() => Promise.resolve(restaurants));
-            });
-        });
-    }*/
+      .then(db => {
+        const tr = db.transaction('restaurants');
+        const restaurantStore = tr.objectStore('restaurants');
+        return restaurantStore.getAll();
+      })
+      .then(restaurants => {
+        if (restaurants.length !== 0) {
+          return Promise.resolve(restaurants);
+        }
+        return this.cacheRestaurants();
+      })
+  }*/
+
+  static cacheRestaurants() {
+    return fetch(DBHelper.DATABASE_URL + '/restaurants').then(response => response.json()).then(restaurants => {
+      return this.dBPromise().then(db => {
+        const tr = db.transaction('restaurants', 'readwrite');
+        const restaurantStore = tr.objectStore('restaurants');
+        restaurants.forEach(restaurant => restaurantStore.put(restaurant));
+
+        return tr.complete.then(() => Promise.resolve(restaurants));
+      });
+    });
+  }
 
   static getStoredObjectById(table, idx, id) {
     return this.dBPromise().then(function (db) {
