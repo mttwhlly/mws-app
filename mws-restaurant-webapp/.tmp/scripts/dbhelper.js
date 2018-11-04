@@ -244,8 +244,8 @@ class DBHelper {
       this.dBPromise().then(db => {
         if (!db) return;
 
-        let tx = db.transaction('reviews', 'readwrite');
-        const store = tx.objectStore('reviews');
+        let tr = db.transaction('reviews', 'readwrite');
+        const store = tr.objectStore('reviews');
         if (Array.isArray(reviews)) {
           reviews.forEach(function (review) {
             store.put(review);
@@ -254,7 +254,7 @@ class DBHelper {
           store.put(reviews);
         }
       });
-      console.log('revs are: ', reviews);
+      console.log('reviews are fetched: ', reviews);
       return Promise.resolve(reviews);
     }).catch(error => {
       return DBHelper.getStoredObjectById('reviews', 'restaurant', id).then(storedReviews => {
@@ -342,7 +342,7 @@ class DBHelper {
         'Content-Type': 'application/json; charset=utf-8'
       })
     };
-    fetch(`http://localhost:1337/reviews`, fetch_options).then(response => {
+    fetch(`http://localhost:1337/reviews`, fetchOptions).then(response => {
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.indexOf('application/json') !== -1) {
         return response.json();

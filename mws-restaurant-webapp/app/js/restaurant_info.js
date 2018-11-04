@@ -146,7 +146,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     return;
   }
   const ul = document.getElementById('reviews-list');
-  console.log(reviews)
+  console.log('adding reviews to html: ' + reviews)
   reviews.forEach(review => {
     ul.appendChild(createReviewHTML(review));
   });
@@ -177,6 +177,48 @@ createReviewHTML = (review) => {
   li.appendChild(comments);
   return li;
 };
+
+/**
+ * Deal with review form submissions
+ */
+// Form validation & submission
+
+addReview = () => {
+  event.preventDefault();
+  // Getting the data from the form
+  let restaurantId = getParameterByName('id');
+  let name = document.getElementById('name').value;
+  let rating;
+  let comments = document.getElementById('msg').value;
+  rating = document.querySelector('.star input:checked').value;
+  const review = [restaurantId, name, rating, comments];
+
+  // Add data to DOM
+  const formReview = {
+      restaurant_id: parseInt(review[3]),
+      rating: parseInt(review[1]),
+      name: review[0],
+      comments: review[2].substring(0, 300),
+      createdAt: new Date()
+  };
+  // Send review to backend
+  DBHelper.addReview(formReview);
+  addReviewHTML(formReview);
+  document.getElementsByTagName('form').reset();
+};
+
+addReviewHTML = (review) => {
+  if (document.getElementById('no-review')) {
+      document.getElementById('no-review').remove();
+  }
+  const container = document.getElementById('reviews-container');
+  const ul = document.getElementById('reviews-list');
+
+  //insert the new review on top
+  ul.insertBefore(createReviewHTML(review), ul.firstChild);
+  container.appendChild(ul);
+}
+
 
 /**
  * Add restaurant name to the breadcrumb navigation menu
