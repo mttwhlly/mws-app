@@ -9,8 +9,9 @@
   <meta name="theme-color" content="#006fb9">
   <title>Restaurant Info</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
+  <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+    crossorigin="" />
   <!-- <link rel="stylesheet" href="../css/leaflet.css" inline> -->
   <link rel="stylesheet" href="../css/styles.css" inline>
 </head>
@@ -50,56 +51,55 @@
       <label id="restaurant-hours-label">restaurant hours</label>
     </section>
     <!-- end restaurant -->
+
     <!-- Beginning map -->
     <section id="map-container" aria-labelledby="map-aria-label" role="application">
       <div id="map"></div>
     </section>
     <label id="map-aria-label">Google map</label>
     <!-- End map -->
+
     <!-- Beginning reviews -->
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
+
     <!-- Beginning review form-->
     <h2 class="form-title">Write a Review</h2>
     <form id="review-form">
-        <p>Name</p>
-      <label for="review"><h2>Name</h2></label>
+      <p>Name</p>
+      <label for="review">
+        <h2>Name</h2>
+      </label>
       <textarea id="name" name="reviewer" rows="1" style="resize:none"></textarea>
       <p>Rating</p>
       <fieldset>
-          <legend>Rating</legend>
-          <div class="star">
-              <input type="radio" id="five"
-                     name="rating" value="5" checked />
-              <label for="five">5</label>★★★★★
-          </div>
-          <div class="star">
-              <input type="radio" id="four"
-                     name="rating" value="4" />
-              <label for="four">4</label>★★★★☆
-          </div>
-          <div class="star">
-              <input type="radio" id="three"
-                     name="rating" value="3" />
-              <label for="three">3</label>★★★☆☆
-          </div>
-          <div class="star">
-              <input type="radio" id="two"
-                     name="rating" value="2" />
-              <label for="two">2</label>★★☆☆☆
-          </div>
-          <div class="star">
-              <input type="radio" id="one"
-                     name="rating" value="1" />
-              <label for="one">1</label>★☆☆☆☆
-          </div>
+        <legend>Rating</legend>
+        <div class="star">
+          <input type="radio" id="five" name="rating" value="5" checked />
+          <label for="five">5</label>★★★★★
+        </div>
+        <div class="star">
+          <input type="radio" id="four" name="rating" value="4" />
+          <label for="four">4</label>★★★★☆
+        </div>
+        <div class="star">
+          <input type="radio" id="three" name="rating" value="3" />
+          <label for="three">3</label>★★★☆☆
+        </div>
+        <div class="star">
+          <input type="radio" id="two" name="rating" value="2" />
+          <label for="two">2</label>★★☆☆☆
+        </div>
+        <div class="star">
+          <input type="radio" id="one" name="rating" value="1" />
+          <label for="one">1</label>★☆☆☆☆
+        </div>
       </fieldset>
       <p>Comments</p>
       <label for="review">Write a review</label>
       <textarea id="msg" name="review_message"></textarea>
-
       <div class="submit-button" onclick="addReview()">
         <button type="post your review">Post Review</button>
       </div>
@@ -108,7 +108,6 @@
   </main>
   <!-- End main -->
 
-  <!-- End footer -->
   <!-- Beginning scripts -->
   <!-- <script type="application/javascript" charset="utf-8" src="js/leaflet/leaflet.js"></script> -->
   <script type="application/javascript" charset="utf-8" src="js/register.js"></script>
@@ -119,18 +118,18 @@
   <script type="text/javascript" src="js/restaurant_info.js" defer></script>
   <!-- Leaflet Maps -->
   <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js" integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
-  crossorigin=""></script>
+    crossorigin=""></script>
   <!-- Google Maps -->
   <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXE-Crbl3m63YYdyP8WF2_CvRbFy47xK8&libraries=places&callback=initMap"></script> -->
   <!-- End scripts -->
-    <!-- Beginning footer -->
-    <footer id="footer">
-      Copyright (c) 2018
-      <a href="/">
-        <strong>Restaurant Reviews</strong>
-      </a> All Rights Reserved.
-    </footer>
-
+  <!-- Beginning footer -->
+  <footer id="footer">
+    Copyright (c) 2018
+    <a href="/">
+      <strong>Restaurant Reviews</strong>
+    </a> All Rights Reserved.
+  </footer>
+  <!-- End footer -->
 </body>
 
 </html>

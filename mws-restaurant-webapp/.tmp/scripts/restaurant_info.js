@@ -1,3 +1,6 @@
+/**
+ * Variables
+ */
 let restaurant;
 var newMap;
 
@@ -5,8 +8,6 @@ var newMap;
  * Initialize map as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', event => {
-  //fetchNeighborhoods();
-  //fetchCuisines();
   initMap();
 });
 
@@ -41,6 +42,9 @@ initMap = () => {
   });
 };
 
+/**
+ * if using Google maps
+ */
 /* window.initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
@@ -130,7 +134,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 };
 
 /**
- * Create all reviews HTML and add them to the webpage.
+ * Create all reviews HTML and add to page
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   //console.log('fill reviews running')
@@ -154,7 +158,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 };
 
 /**
- * Create review HTML and add it to the webpage.
+ * Create review HTML and add to page
  */
 createReviewHTML = review => {
   // create the reviews
@@ -164,8 +168,8 @@ createReviewHTML = review => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  let d = new Date(review.createdAt).toDateString(); //`${review.date}`;
-  date.innerHTML = 'Date: ' + d; //`Date: ${review.date}.toLocaleString()}`;
+  let d = new Date(review.createdAt).toDateString();
+  date.innerHTML = 'Date: ' + d;
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -181,19 +185,14 @@ createReviewHTML = review => {
 /**
  * Deal with review form submissions
  */
-// Form validation & submission
-
 addReview = () => {
   event.preventDefault();
-  // Getting the data from the form
   let restaurantId = getParameterByName('id');
   let name = document.getElementById('name').value;
   let rating;
   let comments = document.getElementById('msg').value;
   rating = document.querySelector('.star input:checked').value;
   const review = [restaurantId, name, rating, comments];
-
-  // Add data to DOM
   const formReview = {
     restaurant_id: parseInt(review[0]),
     name: review[1],
@@ -201,7 +200,7 @@ addReview = () => {
     comments: review[3].substring(0, 300),
     createdAt: new Date()
   };
-  // Send review to backend
+
   DBHelper.addReview(formReview);
   addReviewHTML(formReview);
   document.getElementsByTagName('form').reset();
@@ -213,10 +212,6 @@ addReviewHTML = review => {
   }
   const container = document.getElementById('reviews-container');
   const ul = document.getElementById('reviews-list');
-
-  //insert the new review on top
-  ul.insertBefore(createReviewHTML(review), ul.firstChild);
-  container.appendChild(ul);
 };
 
 /**

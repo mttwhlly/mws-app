@@ -1,53 +1,16 @@
+/**
+ * Import IDB
+ */
 importScripts('js/idb.js');
 
+/**
+ * Variables
+ */
 var cacheID = 'restaurant-reviews-04';
 
-// fetch('http://localhost:1337/restaurants', {
-//     headers: {
-//         "Content-Type": "application/json; charset=utf-8"
-//     },
-// })
-//     .then(function(response){
-//         //console.log('hello');
-//         return response.json();
-//     })
-//     .then(function(data) {
-//         idb.open('restaurantDb', 1, upgradeDB => {
-//             var store = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
-//             //console.log(data);
-//         }).then(function(dB) {
-//             //console.log(dB)
-//             var tr = dB.transaction('restaurants', 'readwrite');
-//             var restaurantStore = tr.objectStore('restaurants');
-//             data.forEach(function(restaurant) {
-//                 restaurantStore.put(restaurant);
-//             });
-//         });
-//     });
-
-// fetch('http://localhost:1337/reviews', {
-//     headers: {
-//         "Content-Type": "application/json; charset=utf-8"
-//     },
-// })
-//     .then(function(response){
-//         //console.log('hello');
-//         return response.json();
-//     })
-//     .then(function(data) {
-//         idb.open('reviewDb', 1, upgradeDB => {
-//             var store = upgradeDB.createObjectStore('reviews', {keyPath: 'id'});
-//             //console.log(data);
-//         }).then(function(dB) {
-//             //console.log(dB)
-//             var tr = dB.transaction('reviews', 'readwrite');
-//             var reviewStore = tr.objectStore('reviews');
-//             data.forEach(function(review) {
-//                 reviewStore.put(review);
-//             });
-//         });
-//     });
-
+/**
+ * On install event add things to cache
+ */
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(cacheID).then(cache => {
@@ -84,6 +47,9 @@ self.addEventListener('install', event => {
     );
 });
 
+/**
+ * On fetch
+ */
 self.addEventListener('fetch', event => {
     let cacheRequest = event.request;
     let cacheUrlObj = new URL(event.request.url);
@@ -99,37 +65,3 @@ self.addEventListener('fetch', event => {
         return response || fetch(event.request);
     }));
 });
-
-// self.addEventListener('activate', event => {
-//     event.waitUntil(caches.keys().then(function (cacheNames) {
-//         return Promise.all(cacheNames.filter(function (cacheName) {
-//         return cacheName.startsWith('restaurant-') && !allCaches.includes(cacheName);
-//         }).map(function (cacheName) {
-//         return caches['delete'](cacheName);
-//         }));
-//     }));
-// });
-
-// event.respondWith(caches.match(cacheRequest).then(response => {
-//     return (
-//         response ||
-//             fetch(event.request)
-//             .then(fetchResponse => {
-//                 caches.open(cacheID).then(cache => {
-//                     cache.put(event.request, fetchResponse.clone())
-//                     return fetchResponse;
-//                 }).catch(function() {
-//                     console.log('something wrong with running fetch response function')
-//                     // Do nothing.
-//                 });
-//             })
-//             .catch(error => {
-//                 console.log(error);
-//                 return new Response('Oops, it looks like you are not connected to the internet', {
-//                     status: 404,
-//                     statusText: 'Not connected to the internet'
-//                 });
-//             })
-//         );
-//     })
-//);

@@ -565,6 +565,15 @@
         "createdAt": "2018-11-04T02:22:08.736Z",
         "updatedAt": "2018-11-04T02:22:08.736Z",
         "id": 36
+      },
+      {
+        "name": "moe offline",
+        "rating": 3,
+        "comments": "heyo!",
+        "restaurant_id": 1,
+        "createdAt": "2018-11-04T23:49:56.899Z",
+        "updatedAt": "2018-11-04T23:49:56.899Z",
+        "id": 37
       }
     ]
   },
@@ -620,7 +629,7 @@
       "id": 10
     },
     "reviews": {
-      "id": 36
+      "id": 37
     }
   }
 }

@@ -13,11 +13,11 @@ const reload = browserSync.reload;
 
 let dev = true;
 
-gulp.task('inline', function() {
+gulp.task('inline', function () {
   return gulp.src('app/html-src/*.html')
-  .pipe(inlinesource())
-  .pipe(gulp.dest('app/'));
- });
+    .pipe(inlinesource())
+    .pipe(gulp.dest('app/'));
+});
 
 gulp.task('css', () => {
   return gulp.src('app/css/*.css')

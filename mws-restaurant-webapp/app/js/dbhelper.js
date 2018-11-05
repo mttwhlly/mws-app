@@ -1,11 +1,10 @@
 /**
- * Common database helper functions.
+ * Common database helper functions
  */
 class DBHelper {
 
   /**
-   * Database URL.
-   * Change this to restaurants.json file location on your server.
+   * Database URL
    */
   static get DATABASE_URL() {
     const port = 1337; // Change this to your server port
@@ -15,7 +14,6 @@ class DBHelper {
   /**
    * Fetch restaurants.
    */
-
   static fetchRestaurants(callback, id) {
     let fetchURL;
     if (!id) {
@@ -23,8 +21,6 @@ class DBHelper {
     } else {
       fetchURL = DBHelper.DATABASE_URL + '/restaurants/' + id;
     }
-
-    //let xhr = new XMLHttpRequest();
 
     fetch(fetchURL, {
         method: 'GET'
@@ -36,8 +32,6 @@ class DBHelper {
       .then(restaurants => {
         //console.log('restaurants JSON: ', restaurants);
         callback(null, restaurants);
-
-
         return this.dBPromise()
       })
       .then(db => {
@@ -51,29 +45,13 @@ class DBHelper {
         }
         return this.cacheRestaurants();
       })
-
       .catch(error => {
         callback(`Unable to fulfill request. ${error}`, null);
       });
-
-    /*
-        xhr.open('GET', DBHelper.DATABASE_URL);
-        xhr.onload = () => {
-          if (xhr.status === 200) { // Got a success response from server!
-            const json = JSON.parse(xhr.responseText);
-            const restaurants = json.restaurants;
-            callback(null, restaurants);
-          } else { // Oops!. Got an error from server.
-            const error = (`Request failed. Returned status of ${xhr.status}`);
-            callback(error, null);
-          }
-        };
-        xhr.send();
-*/
   }
 
   /**
-   * Fetch a restaurant by its ID.
+   * Fetch restaurants by ID
    */
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
@@ -92,7 +70,7 @@ class DBHelper {
   }
 
   /**
-   * Fetch restaurants by a cuisine type with proper error handling.
+   * Fetch restaurants by a cuisine type with proper error handling
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
     // Fetch all restaurants  with proper error handling
@@ -108,7 +86,7 @@ class DBHelper {
   }
 
   /**
-   * Fetch restaurants by a neighborhood with proper error handling.
+   * Fetch restaurants by a neighborhood with proper error handling
    */
   static fetchRestaurantByNeighborhood(neighborhood, callback) {
     // Fetch all restaurants
@@ -124,7 +102,7 @@ class DBHelper {
   }
 
   /**
-   * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
+   * Fetch restaurants by a cuisine and a neighborhood with proper error handling
    */
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
@@ -145,7 +123,7 @@ class DBHelper {
   }
 
   /**
-   * Fetch all neighborhoods with proper error handling.
+   * Fetch all neighborhoods with proper error handling
    */
   static fetchNeighborhoods(callback) {
     // Fetch all restaurants
@@ -163,7 +141,7 @@ class DBHelper {
   }
 
   /**
-   * Fetch all cuisines with proper error handling.
+   * Fetch all cuisines with proper error handling
    */
   static fetchCuisines(callback) {
     // Fetch all restaurants
@@ -181,22 +159,22 @@ class DBHelper {
   }
 
   /**
-   * Restaurant page URL.
+   * Restaurant page URL
    */
   static urlForRestaurant(restaurant) {
     return (`./restaurant.html?id=${restaurant.id}`);
   }
 
   /**
-   * Restaurant image URL.
+   * Restaurant image URL
    */
   static imageUrlForRestaurant(restaurant) {
     return (`/img/${restaurant.photograph}.jpg`);
   }
-  /**
-   * Put restaurant info into IndexedDB using IDB.js
-   */
 
+  /**
+   * Open IndexedDB stores using IDB.js
+   */
   static dBPromise() {
     return idb.open('restaurantDb', 2, (upgradeDB) => {
       switch (upgradeDB.oldVersion) {
@@ -212,22 +190,9 @@ class DBHelper {
     });
   }
 
-  /*static fetchRestaurants() {
-
-    return this.dBPromise()
-      .then(db => {
-        const tr = db.transaction('restaurants');
-        const restaurantStore = tr.objectStore('restaurants');
-        return restaurantStore.getAll();
-      })
-      .then(restaurants => {
-        if (restaurants.length !== 0) {
-          return Promise.resolve(restaurants);
-        }
-        return this.cacheRestaurants();
-      })
-  }*/
-
+  /**
+   * Add restaurants to IndexedDB
+   */
   static cacheRestaurants() {
     return fetch(DBHelper.DATABASE_URL + '/restaurants')
       .then(response => response.json())
@@ -243,7 +208,9 @@ class DBHelper {
       });
   }
 
-
+  /**
+   * Retrieve object by Id
+   */
   static getStoredObjectById(table, idx, id) {
     return this.dBPromise()
       .then(function (db) {
@@ -255,7 +222,9 @@ class DBHelper {
       });
   }
 
-  // fetch reviews
+  /**
+   * Fetch reviews
+   */
   static fetchReviews(id) {
     return fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${id}`)
       .then(response => response.json())
@@ -285,10 +254,10 @@ class DBHelper {
           })
       });
   }
+
   /**
    * Update `is_favorite` in DB -- referenced: MWS Webinar Stage 3 Project Walk-Through Webinar by Elisa Romondia and Lorenzo Zaccagnini
    */
-
   static updateFave(restaurantID, isFavorite) {
     console.log('updated status: ' + isFavorite)
 
@@ -299,11 +268,6 @@ class DBHelper {
       })
       .then(() => {
         this.dBPromise().then(db => {
-          /*if (!db.ok) {
-            throw new TypeError('Bad response status');
-          } else {
-            console.log(db)
-          }*/
           const tr = db.transaction('restaurants', 'readwrite');
           const store = tr.objectStore('restaurants');
           store.get(restaurantID)
@@ -317,9 +281,8 @@ class DBHelper {
   }
 
   /**
-   * fetch restaurant reviews from REST server
+   * Fetch reviews from server
    */
-
   static fetchServerReviews(id) {
     return fetch(`${DBHelper.DATABASE_URL}reviews/?restaurantid?=${id}`)
       .then(response => response.json())
@@ -346,7 +309,9 @@ class DBHelper {
           })
       })
   }
-
+  /**
+   * Add reviews to localstorage if offline
+   */
   static addReview(review) {
     let offlineReview = {
       name: 'addReview',
@@ -383,6 +348,9 @@ class DBHelper {
       .catch(error)
   }
 
+  /**
+   * Send reviews to server when online
+   */
   static storeAndSendReviews(offlineReview) {
     localStorage.setItem('data', JSON.stringify(offlineReview.data));
     window.addEventListener('online', (event) => {
@@ -414,15 +382,4 @@ class DBHelper {
     marker.addTo(newMap);
     return marker;
   }
-  /* static mapMarkerForRestaurant(restaurant, map) {
-    const marker = new google.maps.Marker({
-      position: restaurant.latlng,
-      title: restaurant.name,
-      url: DBHelper.urlForRestaurant(restaurant),
-      map: map,
-      animation: google.maps.Animation.DROP}
-    );
-    return marker;
-  } */
-
 }

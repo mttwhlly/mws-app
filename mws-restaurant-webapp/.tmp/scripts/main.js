@@ -1,9 +1,12 @@
+/**
+ * Variables
+ */
 let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
 
 /**
- * Fetch neighborhoods and cuisines as soon as the page is loaded.
+ * Fetch neighborhoods and cuisines as soon as the page is loaded
  */
 document.addEventListener('DOMContentLoaded', event => {
   initMap(); // added
@@ -12,7 +15,7 @@ document.addEventListener('DOMContentLoaded', event => {
 });
 
 /**
- * Fetch all neighborhoods and set their HTML.
+ * Fetch all neighborhoods and set their HTML
  */
 fetchNeighborhoods = () => {
   DBHelper.fetchNeighborhoods((error, neighborhoods) => {
@@ -27,7 +30,7 @@ fetchNeighborhoods = () => {
 };
 
 /**
- * Set neighborhoods HTML.
+ * Set neighborhoods HTML
  */
 fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
   const select = document.getElementById('neighborhoods-select');
@@ -40,7 +43,7 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
 };
 
 /**
- * Fetch all cuisines and set their HTML.
+ * Fetch all cuisines and set their HTML
  */
 fetchCuisines = () => {
   DBHelper.fetchCuisines((error, cuisines) => {
@@ -55,7 +58,7 @@ fetchCuisines = () => {
 };
 
 /**
- * Set cuisines HTML.
+ * Set cuisines HTML
  */
 fillCuisinesHTML = (cuisines = self.cuisines) => {
   const select = document.getElementById('cuisines-select');
@@ -69,7 +72,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
 };
 
 /**
- * Initialize leaflet map, called from HTML.
+ * Initialize leaflet map, called from HTML
  */
 initMap = () => {
   self.newMap = L.map('map', {
@@ -86,18 +89,22 @@ initMap = () => {
 
   updateRestaurants();
 };
-/* window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: loc,
-    scrollwheel: false
-  });
-  updateRestaurants();
+
+/**
+ * If using Google maps
+ */
+/*window.initMap = () => {
+let loc = {
+  lat: 40.722216,
+  lng: -73.987501
 };
+self.map = new google.maps.Map(document.getElementById('map'), {
+  zoom: 12,
+  center: loc,
+  scrollwheel: false
+});
+updateRestaurants();
+}; */
 
 /**
  * Update page and map for current restaurants.
@@ -163,6 +170,9 @@ createRestaurantHTML = restaurant => {
   image.setAttribute('alt', image.src);
   li.append(image);
 
+  /**
+   * Favorite button UI & functionality
+   */
   const changeHeart = (el, hrt) => {
     if (!hrt) {
       console.log('not a fave');
